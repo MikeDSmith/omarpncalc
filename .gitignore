@@ -1,5 +1,7 @@
 build/
 build-tests/
+# makepkg work dirs
 /pkg/
-/src-pkg/
+/src/omarpn/
+/omarpn/
 *.pkg.tar.zst
