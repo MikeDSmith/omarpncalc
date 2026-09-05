@@ -19,10 +19,44 @@ Window {
     visible: true
     color: theme.background
 
-    property int pad: 20
-    property int gap: 12
+    // Every size in the face is expressed at the 400 × 660 design size and
+    // scales with the window. The desktop text scale (`omarchy display text
+    // size`) picks the initial window size and resizes it live on change.
+    readonly property real uiScale: Math.min(width / 400, height / 660)
+    // The scale the window was last sized for. The portal answers
+    // asynchronously, so the factor may be known before or after the window
+    // is up; either way the size is applied exactly once per change.
+    property real appliedTextScale: 1.0
+    // Before the first frame the window can still size itself; afterwards
+    // Hyprland only honours resizes made through its own IPC.
+    property bool mapped: false
+    onFrameSwapped: mapped = true
 
+    function applyTextScale() {
+        var factor = textScale.factor / appliedTextScale
+        appliedTextScale = textScale.factor
+        if (factor === 1 || visibility === Window.FullScreen)
+            return
+        var w = Math.round(width * factor), h = Math.round(height * factor)
+        if (mapped && hyprland.available) {
+            hyprland.resizeWindow(w, h)
+        } else {
+            width = w
+            height = h
+        }
+    }
+    Component.onCompleted: applyTextScale()
+
+    Connections {
+        target: textScale
+        function onFactorChanged() { win.applyTextScale() }
+    }
+
+    function s(px) { return Math.max(1, Math.round(px * uiScale)) }
     function alpha(c, a) { return Qt.rgba(c.r, c.g, c.b, a) }
+
+    property int pad: s(20)
+    property int gap: s(12)
 
     Item {
         id: keys
@@ -76,8 +110,8 @@ Window {
             // ---------- stack display ----------
             Column {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 150
-                spacing: 2
+                Layout.preferredHeight: win.s(150)
+                spacing: win.s(2)
 
                 Repeater {
                     model: calc.levels
@@ -85,7 +119,7 @@ Window {
                         required property var modelData
                         readonly property bool isX: modelData.level === 1
                         width: parent.width
-                        height: isX ? 56 : 28
+                        height: win.s(isX ? 56 : 28)
 
                         Text {
                             anchors.left: parent.left
@@ -96,33 +130,33 @@ Window {
                             color: status ? (calc.message === "Copied" ? theme.accent : theme.urgent)
                                           : win.alpha(theme.foreground, 0.35)
                             font.family: "monospace"
-                            font.pixelSize: status ? 14 : parent.isX ? 18 : 14
+                            font.pixelSize: win.s(status ? 14 : parent.isX ? 18 : 14)
                         }
 
                         Row {
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: 2
+                            spacing: win.s(2)
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: modelData.value
                                 color: parent.parent.isX ? theme.foreground : win.alpha(theme.foreground, 0.55)
                                 font.family: "monospace"
-                                font.pixelSize: parent.parent.isX ? 44 : 22
+                                font.pixelSize: win.s(parent.parent.isX ? 44 : 22)
                                 font.weight: parent.parent.isX ? Font.Medium : Font.Normal
                                 // Never hide digits: shrink the font until the whole
                                 // number fits (the engine bounds the width, so it always does).
                                 fontSizeMode: Text.HorizontalFit
-                                minimumPixelSize: parent.parent.isX ? 20 : 12
+                                minimumPixelSize: win.s(parent.parent.isX ? 20 : 12)
                                 horizontalAlignment: Text.AlignRight
-                                width: Math.min(implicitWidth, keys.width - win.pad * 2 - 44)
+                                width: Math.min(implicitWidth, keys.width - win.pad * 2 - win.s(44))
                             }
                             // Insertion bar while a number is being typed.
                             Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: modelData.typing
-                                width: 3
-                                height: parent.parent.isX ? 36 : 18
+                                width: win.s(3)
+                                height: win.s(parent.parent.isX ? 36 : 18)
                                 radius: 1
                                 color: theme.accent
                             }

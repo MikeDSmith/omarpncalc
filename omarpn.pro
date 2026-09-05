@@ -1,15 +1,19 @@
-QT += core gui qml quick
+QT += core gui qml quick dbus
 CONFIG += c++17 release
 TARGET = omarpn
 TEMPLATE = app
 
 HEADERS += \
     src/calculator.h \
+    src/hyprland.h \
+    src/textscale.h \
     src/theme.h
 
 SOURCES += \
     src/main.cpp \
     src/calculator.cpp \
+    src/hyprland.cpp \
+    src/textscale.cpp \
     src/theme.cpp
 
 RESOURCES += src/resources.qrc

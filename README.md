@@ -6,7 +6,10 @@ An RPN calculator for [Omarchy](https://omarchy.org), styled after
 The stack is unbounded (HP-48 style) with four levels visible. `enter` pushes
 the typed number, or duplicates X when nothing is typed; typing after an
 operation lifts the stack. Colours follow the current Omarchy theme and update
-live when it changes.
+live when it changes; the window sizes itself to `omarchy display text size`
+and re-flows live too (resizing the window scales the whole face; on
+Hyprland the live resize goes through `hyprctl`, since the compositor ignores
+a mapped floating window resizing itself).
 
 ## Build
 

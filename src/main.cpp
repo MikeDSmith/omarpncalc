@@ -6,6 +6,8 @@
 #include <QUrl>
 
 #include "calculator.h"
+#include "hyprland.h"
+#include "textscale.h"
 #include "theme.h"
 
 int main(int argc, char *argv[]) {
@@ -17,6 +19,8 @@ int main(int argc, char *argv[]) {
 
     Calculator calculator(&app);
     Theme theme(&app);
+    TextScale textScale(&app);
+    Hyprland hyprland(&app);
 
     QQmlApplicationEngine engine;
     QObject::connect(&engine, &QQmlApplicationEngine::warnings, &app,
@@ -26,6 +30,8 @@ int main(int argc, char *argv[]) {
     });
     engine.rootContext()->setContextProperty(QStringLiteral("calc"), &calculator);
     engine.rootContext()->setContextProperty(QStringLiteral("theme"), &theme);
+    engine.rootContext()->setContextProperty(QStringLiteral("textScale"), &textScale);
+    engine.rootContext()->setContextProperty(QStringLiteral("hyprland"), &hyprland);
 
     engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
     if (engine.rootObjects().isEmpty())
