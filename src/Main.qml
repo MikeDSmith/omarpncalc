@@ -248,7 +248,7 @@ Window {
 
                 Key { label: "0"; action: function () { calc.digit("0") } }
                 Key { label: "."; action: function () { calc.digit(".") } }
-                Key { label: "⌫"; action: calc.backspace }
+                Key { icon: "backspace"; action: calc.backspace }
             }
         }
     }
