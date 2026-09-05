@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Omarpn
+GenericName=RPN Calculator
+Comment=RPN calculator for Omarchy
+Exec=omarpn
+Icon=omarpn
+Terminal=false
+Categories=Utility;Calculator;
+Keywords=calculator;calc;rpn;math;arithmetic;
+StartupWMClass=omarpn

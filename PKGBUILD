@@ -1,0 +1,32 @@
+# Maintainer: Mike Smith
+pkgname=omarpn
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="RPN calculator for Omarchy, built with Qt Quick"
+arch=('x86_64')
+url="https://github.com/mikedsmith/omarpn"
+license=('MIT')
+depends=('hicolor-icon-theme' 'qt6-base' 'qt6-declarative')
+makedepends=('git')
+source=("git+file://${startdir}")
+sha256sums=('SKIP')
+
+build() {
+  cd "$srcdir/$pkgname"
+  qmake6 omarpn.pro
+  make
+}
+
+check() {
+  cd "$srcdir/$pkgname"
+  mkdir -p build-tests && cd build-tests
+  qmake6 ../tests/tests.pro
+  make
+  QT_QPA_PLATFORM=offscreen ./tst_calculator
+}
+
+package() {
+  cd "$srcdir/$pkgname"
+  make INSTALL_ROOT="$pkgdir" install
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
