@@ -6,4 +6,4 @@ ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 "$ROOT/bin/build"
 sudo make -C "$ROOT/build" install
 command -v gtk-update-icon-cache >/dev/null 2>&1 && sudo gtk-update-icon-cache -q /usr/share/icons/hicolor || true
-echo "Installed /usr/bin/omarpn"
+echo "Installed /usr/bin/omarpncalc"

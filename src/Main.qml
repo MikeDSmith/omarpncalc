@@ -11,7 +11,7 @@ import QtQuick.Window
 //       Ctrl+C / Super+C = copy X   Ctrl+V / Super+V = paste as X
 Window {
     id: win
-    title: "Omarpn"
+    title: "OmaRPNCalc"
     width: 400
     height: 660
     minimumWidth: 320

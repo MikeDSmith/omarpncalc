@@ -1,10 +1,10 @@
 # Maintainer: Mike Smith
-pkgname=omarpn
+pkgname=omarpncalc
 pkgver=0.1.0
 pkgrel=1
 pkgdesc="RPN calculator for Omarchy, built with Qt Quick"
 arch=('x86_64')
-url="https://github.com/mikedsmith/omarpn"
+url="https://github.com/mikedsmith/omarpncalc"
 license=('MIT')
 depends=('hicolor-icon-theme' 'qt6-base' 'qt6-declarative')
 makedepends=('git')
@@ -13,7 +13,7 @@ sha256sums=('SKIP')
 
 build() {
   cd "$srcdir/$pkgname"
-  qmake6 omarpn.pro
+  qmake6 omarpncalc.pro
   make
 }
 

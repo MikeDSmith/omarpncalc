@@ -1,4 +1,4 @@
-# Omarpn
+# OmaRPNCalc
 
 An RPN calculator for [Omarchy](https://omarchy.org), styled after
 [omacalc](https://github.com/omacom-io/omacalc) and built with Qt Quick.
@@ -14,7 +14,7 @@ a mapped floating window resizing itself).
 ## Build
 
 ```sh
-bin/build        # -> build/omarpn
+bin/build        # -> build/omarpncalc
 bin/test         # engine tests (Qt Test, offscreen)
 bin/install      # build + install to /usr (sudo)
 ```
@@ -49,13 +49,13 @@ Bind it in `~/.config/hypr/bindings.lua`:
 ```lua
 hl.unbind("SUPER + CTRL + Q")
 hl.unbind("XF86Calculator")
-o.bind("SUPER + CTRL + Q", "Calculator", "omarpn")
-o.bind("XF86Calculator", "Calculator", "omarpn")
+o.bind("SUPER + CTRL + Q", "Calculator", "omarpncalc")
+o.bind("XF86Calculator", "Calculator", "omarpncalc")
 ```
 
 and float it in `~/.config/hypr/hyprland.lua`:
 
 ```lua
-o.window("omarpn", { float = true })
-o.window("omarpn", { center = true })
+o.window("omarpncalc", { float = true })
+o.window("omarpncalc", { center = true })
 ```

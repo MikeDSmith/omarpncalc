@@ -1,6 +1,6 @@
 QT += core gui qml quick dbus
 CONFIG += c++17 release
-TARGET = omarpn
+TARGET = omarpncalc
 TEMPLATE = app
 
 HEADERS += \
@@ -20,8 +20,8 @@ RESOURCES += src/resources.qrc
 
 # `make install` (or INSTALL_ROOT=... for packaging)
 target.path = /usr/bin
-desktop.files = data/omarpn.desktop
+desktop.files = data/omarpncalc.desktop
 desktop.path = /usr/share/applications
-icon.files = data/omarpn.svg
+icon.files = data/omarpncalc.svg
 icon.path = /usr/share/icons/hicolor/scalable/apps
 INSTALLS += target desktop icon

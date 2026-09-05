@@ -1,11 +1,11 @@
 [Desktop Entry]
 Type=Application
-Name=Omarpn
+Name=OmaRPNCalc
 GenericName=RPN Calculator
 Comment=RPN calculator for Omarchy
-Exec=omarpn
-Icon=omarpn
+Exec=omarpncalc
+Icon=omarpncalc
 Terminal=false
 Categories=Utility;Calculator;
 Keywords=calculator;calc;rpn;math;arithmetic;
-StartupWMClass=omarpn
+StartupWMClass=omarpncalc

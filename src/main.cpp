@@ -12,10 +12,10 @@
 
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
-    app.setApplicationName(QStringLiteral("omarpn"));
-    // The Wayland app_id, so window rules can match the class "omarpn".
-    app.setDesktopFileName(QStringLiteral("omarpn"));
-    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("omarpn")));
+    app.setApplicationName(QStringLiteral("omarpncalc"));
+    // The Wayland app_id, so window rules can match the class "omarpncalc".
+    app.setDesktopFileName(QStringLiteral("omarpncalc"));
+    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("omarpncalc")));
 
     Calculator calculator(&app);
     Theme theme(&app);
