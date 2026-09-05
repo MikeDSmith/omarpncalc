@@ -1,6 +1,9 @@
 #include "hyprland.h"
 
 #include <QCoreApplication>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QProcess>
 #include <QStandardPaths>
 
@@ -9,17 +12,62 @@ Hyprland::Hyprland(QObject *parent) : QObject(parent) {
         m_hyprctl = QStandardPaths::findExecutable(QStringLiteral("hyprctl"));
 }
 
-void Hyprland::resizeWindow(int width, int height) const {
+void Hyprland::dispatchForOwnWindow(const QString &dispatcher) const {
     if (!available())
         return;
     const QString lua = QStringLiteral(
         "for _, w in ipairs(hl.get_windows({ class = \"%1\" })) do "
-        "if w.pid == %2 then "
-        "hl.dispatch(hl.dsp.window.resize({ x = %3, y = %4, relative = false, window = w })) "
-        "end end")
+        "if w.pid == %2 then %3 end end")
         .arg(QCoreApplication::applicationName())
         .arg(QCoreApplication::applicationPid())
-        .arg(width)
-        .arg(height);
+        .arg(dispatcher);
     QProcess::startDetached(m_hyprctl, { QStringLiteral("eval"), lua });
+}
+
+// Resize and re-centre in a single dispatch. Separate calls would be separate
+// hyprctl processes with no ordering guarantee, and the compositor would
+// sometimes place the window against the work area as it was mid-resize --
+// leaving it overlapping the bar.
+void Hyprland::resizeWindow(int width, int height) const {
+    dispatchForOwnWindow(
+        QStringLiteral(
+            "hl.dispatch(hl.dsp.window.resize({ x = %1, y = %2, relative = false, window = w })) "
+            "hl.dispatch(hl.dsp.window.center({ window = w }))")
+            .arg(width)
+            .arg(height));
+}
+
+// Wayland never tells a client the work area -- Qt's Screen.desktopAvailable*
+// just repeats the full screen size -- so the space a bar reserves has to come
+// from the compositor. `reserved` is [left, top, right, bottom]; confirmed by
+// toggling the top bar and watching index 1 move between 26 and 0.
+QSize Hyprland::workArea() const {
+    if (!available())
+        return QSize();
+
+    QProcess hyprctl;
+    hyprctl.start(m_hyprctl, { QStringLiteral("monitors"), QStringLiteral("-j") });
+    if (!hyprctl.waitForFinished(1000))
+        return QSize();
+
+    const QJsonArray monitors = QJsonDocument::fromJson(hyprctl.readAllStandardOutput()).array();
+    for (const QJsonValue &value : monitors) {
+        const QJsonObject monitor = value.toObject();
+        if (!monitor.value(QStringLiteral("focused")).toBool())
+            continue;
+
+        const double scale = monitor.value(QStringLiteral("scale")).toDouble();
+        if (scale <= 0)
+            break;
+
+        const QJsonArray reserved = monitor.value(QStringLiteral("reserved")).toArray();
+        const int width = qRound(monitor.value(QStringLiteral("width")).toDouble() / scale)
+            - reserved.at(0).toInt() - reserved.at(2).toInt();
+        const int height = qRound(monitor.value(QStringLiteral("height")).toDouble() / scale)
+            - reserved.at(1).toInt() - reserved.at(3).toInt();
+        if (width > 0 && height > 0)
+            return QSize(width, height);
+        break;
+    }
+    return QSize();
 }
