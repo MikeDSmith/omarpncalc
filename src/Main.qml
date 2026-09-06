@@ -2,12 +2,13 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Window
 
-// Keys: 0-9 . e (exponent)   Enter = enter (push / dup)   + - * /
+// Keys: 0-9 . or , e (exponent)   Enter or = : enter (push / dup)   + - * /
 //       Backspace = delete digit (or drop X)   Delete or d = drop
 //       x or Tab = swap   r = roll down   R = roll up   s = +/-
 //       i = 1/x   q = sqrt   m = mr   M = m+   Ctrl+M = m−
 //       c = c (zero X), press again for ac (clear stack and memory)
-//       Escape = clear all, then close when already empty   Ctrl+W = close
+//       Escape = clear all, then close when already empty
+//       Ctrl+W / Ctrl+Q = close
 //       Ctrl+C / Super+C = copy X   Ctrl+V / Super+V = paste as X
 Window {
     id: win

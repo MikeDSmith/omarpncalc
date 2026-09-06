@@ -18,11 +18,15 @@ hand (`Super+=` / `Super+-` on Hyprland) and the whole face scales with it.
 
 ```sh
 bin/build        # -> build/omarpncalc
-bin/test         # engine tests (Qt Test, offscreen)
+bin/test         # engine tests, then a QML self-test (both offscreen)
 bin/install      # build + install to /usr (sudo)
 ```
 
 Or package it: `makepkg -si`.
+
+`omarpncalc --self-test` loads the interface, spins the event loop briefly and
+exits non-zero if QML reported anything. The engine tests never load the
+interface and the compiler never sees it, so this is what catches a QML slip.
 
 Requires `qt6-base` and `qt6-declarative` (both part of Omarchy).
 
@@ -30,8 +34,8 @@ Requires `qt6-base` and `qt6-declarative` (both part of Omarchy).
 
 | Key | Action |
 |---|---|
-| `0-9` `.` `e` | digits / decimal / exponent (`±` negates the exponent while typing it) |
-| `Enter` | enter (push, or duplicate X) |
+| `0-9` `.` `,` `e` | digits / decimal / exponent (`±` negates the exponent while typing it) |
+| `Enter` / `=` | enter (push, or duplicate X) |
 | `+` `-` `*` `/` | y+x, y−x, y×x, y÷x |
 | `Backspace` | delete a digit, or drop X when nothing is typed |
 | `Delete` / `d` | drop |
@@ -41,9 +45,13 @@ Requires `qt6-base` and `qt6-declarative` (both part of Omarchy).
 | `i` / `q` | 1/x, √x |
 | `c` | c: discard the entry, else zero X; press again for ac (clear stack and memory) |
 | `m` / `M` / `Ctrl+M` | mr (recall), m+, m− |
-| `Ctrl+C` / `Ctrl+V` | copy X / paste as X |
+| `Ctrl+C` / `Ctrl+V` | copy X / paste as X (`Super` works in place of `Ctrl`) |
 | `Esc` | clear all; press again on an empty calculator to close |
-| `Ctrl+W` | close |
+| `Ctrl+W` / `Ctrl+Q` | close |
+
+Copying takes the value rather than the keystrokes, so what reaches the
+clipboard always pastes back. Pasting accepts thousands separators, both
+`1,234.5` and `1 234.5`.
 
 ## Omarchy integration
 

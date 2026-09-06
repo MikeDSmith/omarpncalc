@@ -121,15 +121,30 @@ void Calculator::lift() {
     m_noLift = false;
 }
 
+// The value of the entry as typed so far. An exponent still being typed --
+// "5e", or "5e-" after +/- -- is not yet a parseable number, and reading it as
+// zero silently turned a half-finished 5.5e3 into 0 on the next operation.
+// Fall back to the mantissa, which is what the entry means at that point.
+double Calculator::entryValue() const {
+    bool ok = false;
+    double value = QLocale::c().toDouble(m_entry, &ok);
+    if (ok)
+        return value;
+
+    const int exponent = m_entry.indexOf(QLatin1Char('e'));
+    if (exponent > 0) {
+        value = QLocale::c().toDouble(m_entry.left(exponent), &ok);
+        if (ok)
+            return value;
+    }
+    return 0;
+}
+
 // Push the pending entry onto the stack, if there is one.
 void Calculator::commit() {
     if (m_entry.isEmpty())
         return;
-    bool ok = false;
-    double value = QLocale::c().toDouble(m_entry, &ok);
-    if (!ok)
-        value = 0;
-    m_stack.append(value);
+    m_stack.append(entryValue());
     m_entry.clear();
 }
 
@@ -324,20 +339,26 @@ void Calculator::pushNumber(double value) {
 }
 
 void Calculator::copy() {
-    QString text = m_entry;
-    if (text.isEmpty()) {
-        if (m_stack.isEmpty())
-            return;
+    // Copy the value, not the keystrokes, so what lands on the clipboard is
+    // always a number that pastes back.
+    QString text;
+    if (!m_entry.isEmpty())
+        text = formatNumber(entryValue());
+    else if (!m_stack.isEmpty())
         text = formatNumber(m_stack.last());
-    }
+    else
+        return;
     if (QClipboard *clipboard = QGuiApplication::clipboard())
         clipboard->setText(text);
     flash(QStringLiteral("Copied"));
 }
 
-// Push a number from text, tolerating whitespace and thousands separators.
+// Push a number from text, tolerating whitespace and thousands separators --
+// both the comma kind and the space kind.
 bool Calculator::pasteText(const QString &text) {
+    static const QRegularExpression space(QStringLiteral("\\s"));
     QString cleaned = text.trimmed();
+    cleaned.remove(space);
     cleaned.remove(QLatin1Char(','));
     bool ok = false;
     const double value = QLocale::c().toDouble(cleaned, &ok);

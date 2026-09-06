@@ -183,10 +183,53 @@ private slots:
         QCOMPARE(c.stack(), stack({4, 4}));
     }
 
+    // An exponent still being typed is not a number yet. Reading it as zero
+    // silently turned a half-typed 5.5e3 into 0 on the next operation.
+    void halfTypedExponentKeepsItsMantissa() {
+        Calculator a;
+        press(a, "5"); a.digit("e");
+        a.enter();
+        QCOMPARE(a.stack(), stack({5}));
+
+        // "5e" then +/- leaves "5e-", still not parseable.
+        Calculator b;
+        press(b, "5"); b.digit("e"); b.negate();
+        QCOMPARE(b.entry(), QStringLiteral("5e-"));
+        b.enter();
+        QCOMPARE(b.stack(), stack({5}));
+
+        // Backspacing the exponent digit off 5.5e3 must not lose the 5.5.
+        Calculator c;
+        press(c, "5.5"); c.digit("e"); press(c, "3");
+        c.backspace();
+        QCOMPARE(c.entry(), QStringLiteral("5.5e"));
+        press(c, "enter");
+        QCOMPARE(c.stack(), stack({5.5}));
+
+        // A complete exponent still parses whole.
+        Calculator d;
+        press(d, "5.5"); d.digit("e"); press(d, "3");
+        press(d, "enter");
+        QCOMPARE(d.stack(), stack({5500}));
+    }
+
+    void copyTakesTheValueNotTheKeystrokes() {
+        Calculator a;
+        press(a, "5"); a.digit("e");
+        // What copy() would put on the clipboard must paste back.
+        Calculator b;
+        QVERIFY(b.pasteText(Calculator::formatNumber(5)));
+        QCOMPARE(b.stack(), stack({5}));
+    }
+
     void pasteParsesNumbers() {
         Calculator c;
         QVERIFY(c.pasteText(QStringLiteral(" 1,234.5\n")));
         QCOMPARE(c.stack(), stack({1234.5}));
+        // Space-separated thousands, as many locales write them.
+        QVERIFY(c.pasteText(QStringLiteral("1 234 567")));
+        QCOMPARE(c.stack().last(), 1234567.0);
+        c.drop();
         QVERIFY(!c.pasteText(QStringLiteral("abc")));
         QCOMPARE(c.message(), QStringLiteral("Not a number"));
         // Pasting commits a pending entry first.

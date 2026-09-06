@@ -69,6 +69,8 @@ signals:
     void messageChanged();
 
 private:
+    // The value of the entry as typed so far.
+    double entryValue() const;
     void commit();
     void lift();
     void push(double value);
