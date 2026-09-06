@@ -5,7 +5,7 @@ An RPN calculator for [Omarchy](https://omarchy.org), styled after
 
 The stack is unbounded (HP-48 style) with four levels visible. `enter` pushes
 the typed number, or duplicates X when nothing is typed; typing after an
-operation lifts the stack. Colours follow the current Omarchy theme and update
+operation lifts the stack. Colors follow the current Omarchy theme and update
 live when it changes.
 
 The window is a fixed 400x660, shrinking only for a screen too small to hold

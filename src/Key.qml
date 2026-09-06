@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Window
 
 // One keypad button. Digits sit almost flush with the page, the operator
-// column lifts a step lighter, and enter fills with the accent colour.
+// column lifts a step lighter, and enter fills with the accent color.
 Rectangle {
     id: key
 

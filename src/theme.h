@@ -4,7 +4,7 @@
 #include <QFileSystemWatcher>
 #include <QObject>
 
-// Omarchy theme colours, read from the current theme's colors.toml and
+// Omarchy theme colors, read from the current theme's colors.toml and
 // refreshed live when the theme changes.
 class Theme : public QObject {
     Q_OBJECT
