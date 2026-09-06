@@ -18,3 +18,9 @@ cd "$BUILD_DIR"
 "$QMAKE" "$ROOT/tests/tests.pro"
 make -j"$(nproc 2>/dev/null || echo 1)"
 QT_QPA_PLATFORM=offscreen ./tst_calculator "$@"
+
+# The engine tests never load the interface, so smoke it separately: build the
+# app and let it report any QML error.
+"$ROOT/bin/build" >/dev/null
+QT_QPA_PLATFORM=offscreen "$ROOT/build/omarpncalc" --self-test
+echo "QML self-test passed"

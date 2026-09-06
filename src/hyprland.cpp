@@ -1,6 +1,5 @@
 #include "hyprland.h"
 
-#include <QCoreApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -10,31 +9,6 @@
 Hyprland::Hyprland(QObject *parent) : QObject(parent) {
     if (!qEnvironmentVariableIsEmpty("HYPRLAND_INSTANCE_SIGNATURE"))
         m_hyprctl = QStandardPaths::findExecutable(QStringLiteral("hyprctl"));
-}
-
-void Hyprland::dispatchForOwnWindow(const QString &dispatcher) const {
-    if (!available())
-        return;
-    const QString lua = QStringLiteral(
-        "for _, w in ipairs(hl.get_windows({ class = \"%1\" })) do "
-        "if w.pid == %2 then %3 end end")
-        .arg(QCoreApplication::applicationName())
-        .arg(QCoreApplication::applicationPid())
-        .arg(dispatcher);
-    QProcess::startDetached(m_hyprctl, { QStringLiteral("eval"), lua });
-}
-
-// Resize and re-centre in a single dispatch. Separate calls would be separate
-// hyprctl processes with no ordering guarantee, and the compositor would
-// sometimes place the window against the work area as it was mid-resize --
-// leaving it overlapping the bar.
-void Hyprland::resizeWindow(int width, int height) const {
-    dispatchForOwnWindow(
-        QStringLiteral(
-            "hl.dispatch(hl.dsp.window.resize({ x = %1, y = %2, relative = false, window = w })) "
-            "hl.dispatch(hl.dsp.window.center({ window = w }))")
-            .arg(width)
-            .arg(height));
 }
 
 // Wayland never tells a client the work area -- Qt's Screen.desktopAvailable*

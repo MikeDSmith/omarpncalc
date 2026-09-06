@@ -12,81 +12,44 @@ import QtQuick.Window
 Window {
     id: win
     title: "OmaRPNCalc"
-    width: 400
-    height: 660
+    width: designWidth
+    height: designHeight
     minimumWidth: 320
     minimumHeight: 520
     visible: true
     color: theme.background
 
     // Every size in the face is expressed at the design size below and scales
-    // with the window. The desktop text scale (`omarchy display text size`)
-    // picks the initial window size and resizes it live on change.
+    // with the window, so resizing by hand (Super+= / Super+- on Hyprland)
+    // scales the whole face.
+    //
+    // The desktop text scale is deliberately NOT followed. That knob asks for
+    // bigger text, but font sizes here come from the window size, so honouring
+    // it meant growing the whole window -- padding, gaps, key heights and all
+    // -- which made a calculator you summon and dismiss take over the screen.
+    // The size below is the one worth having at any text setting.
     readonly property int designWidth: 400
     readonly property int designHeight: 660
     readonly property real uiScale: Math.min(width / designWidth, height / designHeight)
 
-    // The desktop knob scales *text*; following it 1:1 grows padding, gaps,
-    // radii and key heights just as fast, so the face swells faster than the
-    // setting asks for. Geometry follows it at a third of the rate instead.
-    readonly property real growth: 0.35
-
-    // Before the first frame the window can still size itself; afterwards
-    // Hyprland only honours resizes made through its own IPC.
-    property bool mapped: false
-    onFrameSwapped: mapped = true
-
-    // Sizing is absolute rather than a ratio applied to the current size, so
-    // it stays idempotent: once the clamp below has kicked in, going back down
-    // returns to exactly the size that scale calls for.
-    function applyTextScale() {
-        if (visibility === Window.FullScreen)
-            return
-
-        var scale = 1 + (textScale.factor - 1) * growth
-
-        // Never grow past the usable screen. Unclamped, the compositor shoves
-        // the window off-screen: at text size 20 the top stack level and the
-        // whole bottom key row were cut off.
+    // The one thing that does change the size: a screen too small to hold it.
+    // Wayland never hands a client the work area (Qt's Screen.desktopAvailable*
+    // just repeats the full screen size), so Hyprland is asked for it.
+    Component.onCompleted: {
         var area = hyprland.workArea()
         if (!(area.width > 0 && area.height > 0))
             area = Qt.size(Screen.desktopAvailableWidth, Screen.desktopAvailableHeight)
-        if (area.width > 0 && area.height > 0)
-            scale = Math.min(scale, area.width / designWidth, area.height / designHeight)
+        if (!(area.width > 0 && area.height > 0))
+            return
 
-        var w = Math.round(designWidth * scale)
-        var h = Math.round(designHeight * scale)
-
-        if (mapped && hyprland.available) {
-            // Always dispatch, even at an unchanged size: the re-centre that
-            // rides along with it is what corrects a window left overlapping
-            // the bar after the bar itself grew.
-            hyprland.resizeWindow(w, h)
-        } else if (w !== width || h !== height) {
-            width = w
-            height = h
-        }
-    }
-    Component.onCompleted: applyTextScale()
-
-    Connections {
-        target: textScale
-        function onFactorChanged() {
-            win.applyTextScale()
-            settle.restart()
+        var scale = Math.min(1, area.width / designWidth, area.height / designHeight)
+        if (scale < 1) {
+            width = Math.round(designWidth * scale)
+            height = Math.round(designHeight * scale)
         }
     }
 
-    // The bar scales with the same desktop setting, so the work area is still
-    // changing when the new factor arrives and the clamp above measures a
-    // stale screen. Re-apply once the bar has settled; applyTextScale is
-    // absolute, so running it again simply corrects the size.
-    Timer {
-        id: settle
-        interval: 1200
-        onTriggered: win.applyTextScale()
-    }
-
+    // Scale a design-size length to the current window.
     function s(px) { return Math.max(1, Math.round(px * uiScale)) }
     function alpha(c, a) { return Qt.rgba(c.r, c.g, c.b, a) }
 
