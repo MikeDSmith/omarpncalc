@@ -4,11 +4,11 @@ pkgver=0.1.0
 pkgrel=1
 pkgdesc="RPN calculator for Omarchy, built with Qt Quick"
 arch=('x86_64')
-url="https://github.com/mikedsmith/omarpncalc"
+url="https://github.com/MikeDSmith/omarpncalc"
 license=('MIT')
 depends=('hicolor-icon-theme' 'qt6-base' 'qt6-declarative')
 makedepends=('git')
-source=("git+file://${startdir}")
+source=("git+$url.git#tag=v$pkgver")
 sha256sums=('SKIP')
 
 build() {
