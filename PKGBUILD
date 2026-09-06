@@ -23,6 +23,9 @@ check() {
   qmake6 ../tests/tests.pro
   make
   QT_QPA_PLATFORM=offscreen ./tst_calculator
+
+  # The engine tests never load the interface, so smoke that separately.
+  QT_QPA_PLATFORM=offscreen "$srcdir/$pkgname/omarpncalc" --self-test
 }
 
 package() {
