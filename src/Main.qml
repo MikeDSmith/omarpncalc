@@ -28,8 +28,8 @@ Window {
 
     // The desktop knob scales *text*; following it 1:1 grows padding, gaps,
     // radii and key heights just as fast, so the face swells faster than the
-    // setting asks for. Geometry follows it at 60% instead.
-    readonly property real growth: 0.6
+    // setting asks for. Geometry follows it at a third of the rate instead.
+    readonly property real growth: 0.35
 
     // Before the first frame the window can still size itself; afterwards
     // Hyprland only honours resizes made through its own IPC.
